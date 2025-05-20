@@ -31,4 +31,5 @@ public class ResidentContributionDTO {
     
     private String contributionTitle;
     private String residentName;
+    private String contributionName;
 } 

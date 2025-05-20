@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.Invoice;
 import com.example.demo.enums.InvoiceStatus;
+import com.example.demo.enums.PaymentStatus;
 import com.example.demo.repository.InvoiceRepository;
 import com.example.demo.service.InvoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +27,7 @@ public class InvoiceAPIController {
     
     @Autowired
     private InvoiceService invoiceService;
+
 
     @GetMapping("/list")
     public List<Map<String, Object>> getAllInvoices() {
@@ -146,9 +149,10 @@ public class InvoiceAPIController {
         Invoice invoice = invoiceService.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Invoice not found with ID: " + id));
         
-        invoice.setStatus(InvoiceStatus.PAID);
-        invoiceService.save(invoice);
-        
+//        invoice.setStatus(InvoiceStatus.PAID);
+//        invoiceService.save(invoice);
+        invoiceService.setPaid(invoice);
+
         return Map.of("status", "success", "message", "Invoice marked as paid successfully");
     }
     

@@ -92,6 +92,7 @@ public class ResidentContributionService {
         residentContribution.setApartmentNumber(dto.getApartmentNumber());
         residentContribution.setAmount(dto.getAmount());
         residentContribution.setNote(dto.getNote());
+        residentContribution.setContributionName(contribution.getTitle());
         
         if (dto.getPaymentStatus() != null) {
             residentContribution.setPaymentStatus(dto.getPaymentStatus());
@@ -169,6 +170,7 @@ public class ResidentContributionService {
         dto.setPaidAt(contribution.getPaidAt());
         dto.setCreatedAt(contribution.getCreatedAt());
         dto.setInvoiceId(contribution.getInvoiceId());
+        dto.setContributionName(contribution.getContributionName());
 
         if (contribution.getResidentId() != null) {
             residentRepository.findById(contribution.getResidentId())

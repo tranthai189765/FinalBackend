@@ -445,6 +445,7 @@ public class ContributionService {
         dto.setStartDate(contribution.getStartDate());
         dto.setEndDate(contribution.getEndDate());
         dto.setTargetAmount(contribution.getTargetAmount());
+        dto.setTotalPaidAmount(contribution.getCurrentAmount());
         dto.setCreatedAt(contribution.getCreatedAt());
         dto.setCreatedBy(contribution.getCreatedBy());
         dto.setStatus(contribution.getStatus());

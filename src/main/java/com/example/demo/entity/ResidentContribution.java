@@ -54,4 +54,7 @@ public class ResidentContribution {
 
     @Column(name = "invoice_id")
     private Long invoiceId;
+
+    @Column(name = "contribution_type_name")
+    private String contributionName;
 } 

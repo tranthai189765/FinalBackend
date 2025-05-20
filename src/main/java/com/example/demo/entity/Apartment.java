@@ -42,11 +42,6 @@ public class Apartment {
     @Column(name = "resident_id")
     private Set<Long> residentIds;
 
-    @OneToMany(mappedBy = "apartment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ParkingRental> parkingRentals;
-
     @Enumerated(EnumType.STRING)
     private ApartmentType type;
-
-
 }

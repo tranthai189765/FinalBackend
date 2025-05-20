@@ -31,7 +31,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter;
 import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
-
+import java.io.InputStream;
 @Service
 public class PdfDocumentService {
 
@@ -43,11 +43,26 @@ public class PdfDocumentService {
 
     private Font createVietnameseFont(String fontName, int size, int style) {
         try {
-            Font f = new Font(BaseFont.createFont("src/main/resources/fonts/" + fontName, 
-                                BaseFont.IDENTITY_H, BaseFont.EMBEDDED), size, style);
-            return f;
+            // Tìm font từ classpath (trong resources)
+            String fontPath = "/fonts/" + fontName;
+            InputStream fontStream = getClass().getResourceAsStream(fontPath);
+
+            if (fontStream == null) {
+                throw new RuntimeException("Không tìm thấy font trong classpath: " + fontPath);
+            }
+
+            BaseFont baseFont = BaseFont.createFont(
+                fontName,
+                BaseFont.IDENTITY_H,
+                BaseFont.EMBEDDED,
+                true,  // cached
+                fontStream.readAllBytes(),  // đọc font thành byte[]
+                null
+            );
+
+            return new Font(baseFont, size, style);
         } catch (Exception e) {
-            throw new RuntimeException("Lỗi khi tạo font: " + e.getMessage(), e);
+            throw new RuntimeException("Lỗi khi tạo font: " + fontName, e);
         }
     }
 

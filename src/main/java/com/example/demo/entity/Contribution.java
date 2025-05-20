@@ -37,6 +37,9 @@ public class Contribution {
     @Column(name = "target_amount")
     private Double targetAmount;
 
+    @Column(name = "current_amount")
+    private Double currentAmount;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 

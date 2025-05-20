@@ -1,12 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.InvoiceDTO;
-import com.example.demo.entity.Apartment;
-import com.example.demo.entity.Bill;
-import com.example.demo.entity.Invoice;
-import com.example.demo.entity.Resident;
-import com.example.demo.entity.User;
-import com.example.demo.entity.ResidentContribution;
+import com.example.demo.entity.*;
 import com.example.demo.enums.BillStatus;
 import com.example.demo.enums.InvoiceStatus;
 import com.example.demo.enums.PaymentStatus;
@@ -61,7 +56,9 @@ public class InvoiceService {
     
     @Autowired
     private ResidentContributionRepository residentContributionRepository;
-    
+    @Autowired
+    private ContributionRepository contributionRepository;
+
     private static final DateTimeFormatter INVOICE_NUMBER_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
     public List<Invoice> findAll() {
@@ -118,10 +115,10 @@ public class InvoiceService {
 
         // set invoice_id for bills
 
-
         Long totalAmount = (long)(bills.stream()
                 .mapToDouble(Bill::getAmount)
                 .sum());
+        System.err.println(totalAmount);
         
         LocalDate earliestDueDate = bills.stream()
                 .map(Bill::getDueDate)
@@ -139,8 +136,6 @@ public class InvoiceService {
         invoice.setStatus(InvoiceStatus.UNPAID);
         invoice.setBillIds(billIds);
         invoice.setDueDate(earliestDueDate);
-
-
 
         System.err.println(invoice.getId());
         invoice = invoiceRepository.save(invoice);
@@ -309,6 +304,11 @@ public class InvoiceService {
                     contribution.setPaidAt(LocalDateTime.now());
                     contribution.setTransactionId(transactionId);
                     residentContributionRepository.save(contribution);
+
+                    contributionRepository.findById(contribution.getId()).ifPresent(contribution1 -> {
+                        contribution1.setCurrentAmount(contribution1.getCurrentAmount() + contribution.getAmount());
+                        contributionRepository.save(contribution1);
+                    });
                 });
                 
                 Apartment apartment = apartmentRepository.findByApartmentNumber(invoice.getApartmentNumber());
@@ -327,7 +327,7 @@ public class InvoiceService {
         List<Resident> residents = residentRepository.findAllById(residentIds);
         
         String notificationMessage = String.format(
-                "Hóa đơn tổng hợp mới cho căn hộ %s. Số tiền: %,.0f VNĐ. Vui lòng thanh toán.",
+                "Hóa đơn tổng hợp mới cho căn hộ %s. Số tiền: %d VNĐ. Vui lòng thanh toán.",
                 invoice.getApartmentNumber(),
                 invoice.getTotalAmount()
         );
@@ -629,5 +629,20 @@ public class InvoiceService {
                 System.out.println("Đã gửi nhắc nhở thanh toán cho hóa đơn tổng hợp ID: " + invoice.getId());
             }
         }
+    }
+
+    public void setPaid(Invoice invoice) {
+        invoice.setStatus(InvoiceStatus.PAID);
+        invoiceRepository.save(invoice);
+        residentContributionRepository.findByInvoiceId(invoice.getId()).ifPresent(contribution -> {
+            contribution.setPaymentStatus(PaymentStatus.PAID);
+            contribution.setPaidAt(LocalDateTime.now());
+            residentContributionRepository.save(contribution);
+
+            contributionRepository.findById(contribution.getId()).ifPresent(contribution1 -> {
+                contribution1.setCurrentAmount(contribution1.getCurrentAmount() + contribution.getAmount());
+                contributionRepository.save(contribution1);
+            });
+        });
     }
 } 

@@ -23,7 +23,7 @@ public interface BillRepository extends JpaRepository<Bill, Long>, JpaSpecificat
 
     List<Bill> findByPaymentReferenceCode(String referenceCode);
     
-    @Query("SELECT b FROM Bill b WHERE b.apartmentNumber = :apartmentNumber AND b.status = :status")
+    @Query("SELECT b FROM Bill b WHERE b.apartmentNumber = :apartmentNumber AND b.status = :status AND b.invoiceId IS NULL")
     List<Bill> findByApartmentNumberAndStatus(@Param("apartmentNumber") String apartmentNumber, @Param("status") BillStatus status);
     
     @Query("SELECT b FROM Bill b WHERE b.apartmentNumber = :apartmentNumber AND b.billType = :billType AND b.status = :status")
